@@ -12,7 +12,7 @@ Reproducible Python model estimating congenital heart disease mortality and disa
 
 Congenital heart disease (CHD) is the most common congenital anomaly worldwide, affecting approximately 9–10 per 1000 live births. Survival outcomes depend heavily on timely surgical and catheter-based intervention.
 
-In settings where health systems are disrupted, access to pediatric cardiac care may be reduced or unavailable. Under these conditions, congenital heart disease can lead to increased preventable mortality and long-term disability.
+In settings where health systems are disrupted, access to pediatric cardiac care may be reduced or unavailable. Under these conditions congenital heart disease can lead to increased preventable mortality and long-term disability.
 
 This repository provides a transparent and reproducible population model estimating congenital heart disease burden under disrupted treatment scenarios.
 
@@ -39,7 +39,7 @@ The model follows a deterministic population framework consisting of the followi
 5. Calculate Years Lived with Disability (YLD)  
 6. Compute total Disability Adjusted Life Years (DALYs)
 
-Sensitivity analysis evaluates uncertainty in untreated mortality assumptions.
+Sensitivity analysis and uncertainty simulations evaluate the effect of parameter uncertainty on model outputs.
 
 ---
 
@@ -47,8 +47,6 @@ Sensitivity analysis evaluates uncertainty in untreated mortality assumptions.
 
 ```
 .
-├── chd_burden_model.py
-├── generate_model_diagram.py
 ├── README.md
 ├── METHODS.md
 ├── MODEL_PARAMETERS.md
@@ -58,27 +56,35 @@ Sensitivity analysis evaluates uncertainty in untreated mortality assumptions.
 ├── CITATION.cff
 ├── .gitignore
 │
-└── figures
-    ├── model_structure.png
-    └── model_structure.svg
+├── scripts
+│   ├── chd_burden_model.py
+│   └── generate_model_diagram.py
+│
+├── figures
+│   ├── model_structure.png
+│   └── model_structure.svg
+│
+└── results
 ```
 
-### Key Files
+---
 
-**chd_burden_model.py**  
+## Key Files
+
+**scripts/chd_burden_model.py**  
 Main implementation of the congenital heart disease burden model.
 
+**scripts/generate_model_diagram.py**  
+Script used to generate the model structure diagram.
+
 **MODEL_PARAMETERS.md**  
-Complete documentation of model parameters and assumptions.
+Documentation of all model parameters and assumptions.
 
 **METHODS.md**  
 Technical description of the modeling methodology.
 
 **MODEL_DIAGRAM.md**  
-Conceptual diagram explaining the modeling pipeline.
-
-**generate_model_diagram.py**  
-Script used to generate the model diagram figures.
+Conceptual explanation of the modeling pipeline.
 
 ---
 
@@ -88,7 +94,7 @@ Script used to generate the model diagram figures.
 
 Python 3.8 or newer.
 
-Install dependencies
+Install dependencies:
 
 ```
 pip install -r requirements.txt
@@ -97,10 +103,10 @@ pip install -r requirements.txt
 ### Run the model
 
 ```
-python chd_burden_model.py
+python scripts/chd_burden_model.py
 ```
 
-The script prints model outputs directly to the terminal in a format suitable for manuscript reporting.
+The script prints model outputs directly to the terminal and generates result files in the `results/` directory.
 
 ---
 
@@ -116,7 +122,18 @@ Equation 6 (Years Lived with Disability): 247
 Equation 7 (DALYs): 23543
 ```
 
-Sensitivity analysis results are printed below the baseline model output.
+The model also reports uncertainty intervals generated through simulation.
+
+---
+
+## Results
+
+Running the model generates output files in the `results/` directory, including:
+
+- baseline model outputs
+- uncertainty simulation summaries
+
+These files contain the values used for manuscript reporting.
 
 ---
 
@@ -135,6 +152,8 @@ Detailed methodology is provided in **METHODS.md**, and all parameter values are
 ## Reproducibility
 
 All model equations and parameters are explicitly defined in the codebase to allow transparent reproduction and modification of results.
+
+Running the main model script regenerates the outputs used in the analysis.
 
 The repository is intended to serve as the computational appendix for the associated research analysis.
 
