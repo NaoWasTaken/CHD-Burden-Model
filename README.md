@@ -1,5 +1,9 @@
 # Congenital Heart Disease Burden Model
 
+![Python](https://img.shields.io/badge/python-3.8%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Reproducible](https://img.shields.io/badge/research-reproducible-brightgreen)
+
 Reproducible Python model estimating excess congenital heart disease mortality and disability adjusted life years associated with disruption of pediatric cardiac care.
 
 ---
@@ -26,6 +30,8 @@ The model estimates disease burden using a deterministic population framework co
 6. Compute total Disability Adjusted Life Years (DALYs)
 
 Sensitivity analysis is included to explore uncertainty in untreated mortality assumptions.
+
+A visual overview of the modeling workflow is available in **MODEL_DIAGRAM.md**.
 
 ---
 
@@ -100,11 +106,20 @@ Each scenario recalculates excess mortality, Years of Life Lost, Years Lived wit
 .
 ├── chd_burden_model.py
 ├── README.md
+├── MODEL_PARAMETERS.md
+├── MODEL_DIAGRAM.md
+├── requirements.txt
 └── LICENSE
 ```
 
 **chd_burden_model.py**  
 Python script implementing the congenital heart disease burden model and sensitivity analysis.
+
+**MODEL_PARAMETERS.md**  
+Documentation of all parameters and assumptions used in the model.
+
+**MODEL_DIAGRAM.md**  
+Conceptual diagram illustrating the structure of the modeling pipeline.
 
 ---
 
@@ -113,6 +128,12 @@ Python script implementing the congenital heart disease burden model and sensiti
 ### Requirements
 
 Python 3.8 or newer.
+
+Install dependencies
+
+```
+pip install -r requirements.txt
+```
 
 ### Run the script
 
@@ -158,7 +179,7 @@ YLL represents premature mortality relative to life expectancy.
 
 YLD represents non fatal health loss weighted by disability severity.
 
-Model parameters are derived from published epidemiological literature and demographic estimates.
+Model parameters are derived from published epidemiological literature and demographic estimates. A full list of parameters and values is available in **MODEL_PARAMETERS.md**.
 
 ---
 
