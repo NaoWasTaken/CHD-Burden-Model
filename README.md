@@ -10,7 +10,7 @@ Reproducible Python model estimating excess congenital heart disease mortality a
 
 ## Overview
 
-Congenital heart disease (CHD) is the most common congenital anomaly worldwide, affecting approximately 9–10 per 1000 live births. Advances in pediatric cardiac surgery have significantly improved survival outcomes in settings where specialized care is available.
+Congenital heart disease (CHD) is the most common congenital anomaly worldwide, affecting approximately 9-10 per 1000 live births. Advances in pediatric cardiac surgery have significantly improved survival outcomes in settings where specialized care is available.
 
 In situations where health systems are disrupted, access to surgical and catheter based interventions may be limited. Under these conditions, congenital heart disease can lead to substantial preventable mortality and long term disability.
 
