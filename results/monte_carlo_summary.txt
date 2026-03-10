@@ -1,7 +1,0 @@
-Monte Carlo Uncertainty Analysis
-
-Runs: 10000
-
-Median DALYs: 24107
-Lower 95% interval: 16231
-Upper 95% interval: 31931

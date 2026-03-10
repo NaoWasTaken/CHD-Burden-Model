@@ -1,0 +1,7 @@
+Uncertainty Simulation Results
+
+Simulation runs: 10000
+
+Median DALYs: 23557
+Lower 95 percent interval: 14759
+Upper 95 percent interval: 32112
