@@ -2,25 +2,35 @@
 
 ![Python](https://img.shields.io/badge/python-3.8%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Reproducible](https://img.shields.io/badge/research-reproducible-brightgreen)
+![Research](https://img.shields.io/badge/research-reproducible-brightgreen)
 
-Reproducible Python model estimating excess congenital heart disease mortality and disability adjusted life years associated with disruption of pediatric cardiac care.
+Reproducible Python model estimating congenital heart disease mortality and disability-adjusted life years under disruption of pediatric cardiac care.
 
 ---
 
 ## Overview
 
-Congenital heart disease (CHD) is the most common congenital anomaly worldwide, affecting approximately 9-10 per 1000 live births. Advances in pediatric cardiac surgery have significantly improved survival outcomes in settings where specialized care is available.
+Congenital heart disease (CHD) is the most common congenital anomaly worldwide, affecting approximately 9–10 per 1000 live births. Survival outcomes depend heavily on timely surgical and catheter-based intervention.
 
-In situations where health systems are disrupted, access to surgical and catheter based interventions may be limited. Under these conditions, congenital heart disease can lead to substantial preventable mortality and long term disability.
+In settings where health systems are disrupted, access to pediatric cardiac care may be reduced or unavailable. Under these conditions, congenital heart disease can lead to increased preventable mortality and long-term disability.
 
-This repository contains a transparent and reproducible population model used to estimate congenital heart disease burden associated with disruption of pediatric cardiac care.
+This repository provides a transparent and reproducible population model estimating congenital heart disease burden under disrupted treatment scenarios.
+
+The code serves as the computational implementation supporting the associated research analysis.
+
+---
+
+## Model Diagram
+
+![Model Structure](figures/model_structure.svg)
+
+The model estimates disease burden by combining population demographics, CHD birth prevalence, treatment disruption scenarios, and Global Burden of Disease DALY methodology.
 
 ---
 
 ## Model Structure
 
-The model estimates disease burden using a deterministic population framework consisting of the following steps.
+The model follows a deterministic population framework consisting of the following steps.
 
 1. Estimate births during the study period  
 2. Estimate congenital heart disease incidence  
@@ -29,74 +39,7 @@ The model estimates disease burden using a deterministic population framework co
 5. Calculate Years Lived with Disability (YLD)  
 6. Compute total Disability Adjusted Life Years (DALYs)
 
-Sensitivity analysis is included to explore uncertainty in untreated mortality assumptions.
-
-A visual overview of the modeling workflow is available in **MODEL_DIAGRAM.md**.
-
----
-
-## Equations
-
-Births per year
-
-```
-births_per_year = population * crude_birth_rate
-```
-
-Total births during study period
-
-```
-total_births = births_per_year * study_years
-```
-
-Congenital heart disease cases
-
-```
-chd_cases = total_births * prevalence
-```
-
-Excess mortality
-
-```
-excess_deaths = chd_cases * (untreated_mortality - treated_mortality)
-```
-
-Years of Life Lost
-
-```
-YLL = deaths * (life_expectancy - mean_age_death)
-```
-
-Years Lived With Disability
-
-```
-YLD = survivors * disability_weight * study_years
-```
-
-Total disease burden
-
-```
-DALYs = YLL + YLD
-```
-
----
-
-## Sensitivity Analysis
-
-Untreated mortality varies depending on lesion severity and access to supportive care.
-
-To account for this uncertainty, the model evaluates multiple untreated mortality scenarios.
-
-Scenarios evaluated
-
-```
-0.20 untreated mortality
-0.25 untreated mortality
-0.30 untreated mortality
-0.35 untreated mortality
-```
-
-Each scenario recalculates excess mortality, Years of Life Lost, Years Lived with Disability, and total DALYs.
+Sensitivity analysis evaluates uncertainty in untreated mortality assumptions.
 
 ---
 
@@ -105,21 +48,37 @@ Each scenario recalculates excess mortality, Years of Life Lost, Years Lived wit
 ```
 .
 ├── chd_burden_model.py
+├── generate_model_diagram.py
 ├── README.md
+├── METHODS.md
 ├── MODEL_PARAMETERS.md
 ├── MODEL_DIAGRAM.md
 ├── requirements.txt
-└── LICENSE
+├── LICENSE
+├── CITATION.cff
+├── .gitignore
+│
+└── figures
+    ├── model_structure.png
+    └── model_structure.svg
 ```
 
+### Key Files
+
 **chd_burden_model.py**  
-Python script implementing the congenital heart disease burden model and sensitivity analysis.
+Main implementation of the congenital heart disease burden model.
 
 **MODEL_PARAMETERS.md**  
-Documentation of all parameters and assumptions used in the model.
+Complete documentation of model parameters and assumptions.
+
+**METHODS.md**  
+Technical description of the modeling methodology.
 
 **MODEL_DIAGRAM.md**  
-Conceptual diagram illustrating the structure of the modeling pipeline.
+Conceptual diagram explaining the modeling pipeline.
+
+**generate_model_diagram.py**  
+Script used to generate the model diagram figures.
 
 ---
 
@@ -135,57 +94,49 @@ Install dependencies
 pip install -r requirements.txt
 ```
 
-### Run the script
+### Run the model
 
 ```
 python chd_burden_model.py
 ```
 
-The script prints results directly to the terminal in a clean format suitable for manuscript reporting.
+The script prints model outputs directly to the terminal in a format suitable for manuscript reporting.
 
 ---
 
 ## Example Output
 
 ```
-Births per year: 60900
-Total births (study period): 152250
-
-CHD cases: 1522
-
-Excess deaths: 320
-
-Years of Life Lost (YLL): 23296
-Years Lived with Disability (YLD): 247
-
-Total DALYs: 23543
+Equation 1 (Births per year): 60900
+Equation 2 (Total births): 152250
+Equation 3 (CHD cases): 1522
+Equation 4 (Excess deaths): 320
+Equation 5 (Years of Life Lost): 23296
+Equation 6 (Years Lived with Disability): 247
+Equation 7 (DALYs): 23543
 ```
 
-Sensitivity analysis results appear below the baseline model output.
+Sensitivity analysis results are printed below the baseline model output.
 
 ---
 
 ## Methodology
 
-The model follows the Global Burden of Disease framework for calculating disability adjusted life years.
-
-DALYs are defined as
+The model follows the Global Burden of Disease framework for calculating disability-adjusted life years.
 
 ```
 DALYs = Years of Life Lost (YLL) + Years Lived with Disability (YLD)
 ```
 
-YLL represents premature mortality relative to life expectancy.
-
-YLD represents non fatal health loss weighted by disability severity.
-
-Model parameters are derived from published epidemiological literature and demographic estimates. A full list of parameters and values is available in **MODEL_PARAMETERS.md**.
+Detailed methodology is provided in **METHODS.md**, and all parameter values are documented in **MODEL_PARAMETERS.md**.
 
 ---
 
 ## Reproducibility
 
-The script contains all equations used in the analysis. All parameters and assumptions are explicitly defined in the code to allow transparent reproduction and modification.
+All model equations and parameters are explicitly defined in the codebase to allow transparent reproduction and modification of results.
+
+The repository is intended to serve as the computational appendix for the associated research analysis.
 
 ---
 
@@ -194,6 +145,8 @@ The script contains all equations used in the analysis. All parameters and assum
 If you use this model in research or analysis, please cite:
 
 Boyd A. Congenital Heart Disease Burden Model. GitHub repository.
+
+Citation metadata is available in **CITATION.cff**.
 
 ---
 
