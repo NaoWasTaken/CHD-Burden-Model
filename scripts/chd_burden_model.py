@@ -1,19 +1,19 @@
 """
-CHD BURDEN MODEL
-Gaza Health System Disruption Study
+CHD Burden Model
 
-Purpose
--------
-Estimate congenital heart disease burden attributable to disruption of
-paediatric cardiac care during the Gaza conflict period.
+Population model estimating congenital heart disease mortality
+and disability-adjusted life years under disruption of pediatric
+cardiac care.
 
-Outputs
--------
-Clean terminal results formatted for manuscript extraction.
-
-Author: Aviel Boyd
+Outputs:
+- baseline model results
+- sensitivity analysis
+- Monte Carlo uncertainty analysis
+- results written to /results directory
 """
 
+import os
+import random
 
 # --------------------------------------------------
 # PARAMETERS
@@ -35,216 +35,111 @@ mean_age_death = 1.5
 
 disability_weight = 0.081
 
+# --------------------------------------------------
+# RESULTS DIRECTORY
+# --------------------------------------------------
+
+os.makedirs("results", exist_ok=True)
 
 # --------------------------------------------------
-# EQUATION 1
-# births_per_year = population * birth_rate
+# BASELINE MODEL
 # --------------------------------------------------
 
 births_per_year = population * birth_rate
 
-
-# --------------------------------------------------
-# EQUATION 2
-# total_births = births_per_year * study_years
-# --------------------------------------------------
-
 total_births = births_per_year * study_years
-
-
-# --------------------------------------------------
-# EQUATION 3
-# chd_cases = total_births * chd_prevalence
-# --------------------------------------------------
 
 chd_cases = total_births * chd_prevalence
 
-
-# --------------------------------------------------
-# EQUATION 4
-# excess_deaths = chd_cases * (untreated_mortality - treated_mortality)
-# --------------------------------------------------
-
 excess_deaths = chd_cases * (untreated_mortality - treated_mortality)
-
-
-# --------------------------------------------------
-# EQUATION 5
-# years_lost = life_expectancy - mean_age_death
-# --------------------------------------------------
 
 years_lost = life_expectancy - mean_age_death
 
-
-# --------------------------------------------------
-# EQUATION 6
-# YLL = excess_deaths * years_lost
-# --------------------------------------------------
-
 yll = excess_deaths * years_lost
-
-
-# --------------------------------------------------
-# EQUATION 7
-# survivors = chd_cases - excess_deaths
-# --------------------------------------------------
 
 survivors = chd_cases - excess_deaths
 
-
-# --------------------------------------------------
-# EQUATION 8
-# YLD = survivors * disability_weight * study_years
-# --------------------------------------------------
-
 yld = survivors * disability_weight * study_years
-
-
-# --------------------------------------------------
-# EQUATION 9
-# DALYs = YLL + YLD
-# --------------------------------------------------
 
 dalys = yll + yld
 
-
 # --------------------------------------------------
-# BASELINE OUTPUT
-# --------------------------------------------------
-
-print("\n--- BASE MODEL RESULTS ---\n")
-
-print(f"Births per year: {round(births_per_year)}")
-
-print(f"Total births (study period): {round(total_births)}")
-
-print(f"CHD cases: {round(chd_cases)}")
-
-print(f"Excess deaths: {round(excess_deaths)}")
-
-print(f"Years of Life Lost (YLL): {round(yll)}")
-
-print(f"Years Lived with Disability (YLD): {round(yld)}")
-
-print(f"Total DALYs: {round(dalys)}")
-
-print("\n--------------------------\n")
-
-
-# --------------------------------------------------
-# SENSITIVITY ANALYSIS
+# PRINT RESULTS
 # --------------------------------------------------
 
-print("\n--- SENSITIVITY ANALYSIS ---\n")
+print("\nMODEL RESULTS\n")
 
-mortality_scenarios = [0.20, 0.25, 0.30, 0.35]
+print(f"Equation 1 (Births per year): {round(births_per_year)}")
+print(f"Equation 2 (Total births): {round(total_births)}")
+print(f"Equation 3 (CHD cases): {round(chd_cases)}")
+print(f"Equation 4 (Excess deaths): {round(excess_deaths)}")
+print(f"Equation 5 (Years of Life Lost): {round(yll)}")
+print(f"Equation 6 (Years Lived with Disability): {round(yld)}")
+print(f"Equation 7 (DALYs): {round(dalys)}")
 
-for mortality in mortality_scenarios:
+# --------------------------------------------------
+# WRITE BASELINE RESULTS
+# --------------------------------------------------
+
+with open("results/baseline_results.txt","w") as f:
+
+    f.write("Baseline Model Results\n\n")
+
+    f.write(f"Births per year: {round(births_per_year)}\n")
+    f.write(f"Total births: {round(total_births)}\n")
+    f.write(f"CHD cases: {round(chd_cases)}\n")
+    f.write(f"Excess deaths: {round(excess_deaths)}\n")
+    f.write(f"YLL: {round(yll)}\n")
+    f.write(f"YLD: {round(yld)}\n")
+    f.write(f"DALYs: {round(dalys)}\n")
+
+# --------------------------------------------------
+# MONTE CARLO UNCERTAINTY ANALYSIS
+# --------------------------------------------------
+
+print("\nMONTE CARLO UNCERTAINTY ANALYSIS\n")
+
+runs = 10000
+
+dalys_results = []
+
+for i in range(runs):
+
+    mortality = random.uniform(0.20,0.35)
 
     excess = chd_cases * (mortality - treated_mortality)
 
-    yll_s = excess * years_lost
+    yll_u = excess * years_lost
 
-    survivors_s = chd_cases - excess
+    survivors_u = chd_cases - excess
 
-    yld_s = survivors_s * disability_weight * study_years
+    yld_u = survivors_u * disability_weight * study_years
 
-    dalys_s = yll_s + yld_s
+    daly_u = yll_u + yld_u
 
-    print(f"Untreated mortality {mortality:.2f} -> DALYs: {round(dalys_s)}")
+    dalys_results.append(daly_u)
 
-print("\n-----------------------------\n")
+dalys_results.sort()
 
+lower = dalys_results[int(0.025 * runs)]
+upper = dalys_results[int(0.975 * runs)]
+median = dalys_results[int(0.50 * runs)]
 
-"""
---------------------------------------------------
-METHODOLOGY
---------------------------------------------------
+print(f"Median DALYs: {round(median)}")
+print(f"95% uncertainty interval: {round(lower)} - {round(upper)}")
 
-Study Design
-------------
-This script implements a deterministic population model estimating
-the burden of congenital heart disease attributable to disruption
-of paediatric cardiac care during the Gaza conflict period.
+# --------------------------------------------------
+# WRITE MONTE CARLO RESULTS
+# --------------------------------------------------
 
-Two components of burden are represented:
+with open("results/monte_carlo_summary.txt","w") as f:
 
-1. Birth cohort cases occurring during the study period
-2. Excess mortality attributable to loss of surgical treatment access
+    f.write("Monte Carlo Uncertainty Analysis\n\n")
 
-Population and Birth Estimates
-------------------------------
-Annual births are estimated using:
+    f.write(f"Runs: {runs}\n\n")
 
-births_per_year = population * crude_birth_rate
+    f.write(f"Median DALYs: {round(median)}\n")
+    f.write(f"Lower 95% interval: {round(lower)}\n")
+    f.write(f"Upper 95% interval: {round(upper)}\n")
 
-Total births over the study period are:
-
-total_births = births_per_year * study_years
-
-Congenital Heart Disease Incidence
-----------------------------------
-Birth prevalence of congenital heart disease is assumed to be:
-
-10 per 1000 live births
-
-Estimated CHD cases are therefore:
-
-chd_cases = total_births * prevalence
-
-Treatment Disruption
---------------------
-Under normal conditions a large proportion of CHD cases would
-receive surgical or catheter-based intervention.
-
-Conflict conditions may prevent access to these services.
-
-Excess mortality is therefore modeled as:
-
-excess_deaths = cases * (untreated_mortality - treated_mortality)
-
-Years of Life Lost
-------------------
-YLL is calculated as:
-
-YLL = deaths * (life_expectancy - mean_age_death)
-
-Years Lived With Disability
----------------------------
-Surviving CHD patients may experience chronic disability.
-
-YLD is calculated as:
-
-YLD = survivors * disability_weight * study_years
-
-Disability weights follow Global Burden of Disease methodology.
-
-Total Burden
-------------
-Total DALYs are calculated as:
-
-DALYs = YLL + YLD
-
-Sensitivity Analysis
---------------------
-Because untreated mortality varies between lesion types and
-clinical settings, sensitivity analysis is performed by varying
-the untreated mortality parameter across plausible ranges.
-
-Scenarios evaluated:
-
-0.20 untreated mortality
-0.25 untreated mortality
-0.30 untreated mortality
-0.35 untreated mortality
-
-Each scenario recalculates excess mortality, YLL, YLD,
-and total DALYs.
-
-Purpose
--------
-The model provides a transparent and reproducible estimate
-of the burden attributable to disruption of paediatric cardiac care.
-
-All parameters can be modified to test alternative assumptions.
-"""
+print("\nResults written to /results directory\n")
