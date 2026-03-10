@@ -4,6 +4,6 @@ Births per year: 60900
 Total births: 152250
 CHD cases: 1522
 Excess deaths: 320
-YLL: 23276
-YLD: 244
-DALYs: 23520
+Years of Life Lost (YLL): 23276
+Years Lived with Disability (YLD): 244
+Total DALYs: 23520
