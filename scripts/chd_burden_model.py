@@ -1,19 +1,22 @@
 """
-CHD Burden Model
+Congenital Heart Disease Burden Model
 
-Population model estimating congenital heart disease mortality
-and disability-adjusted life years under disruption of pediatric
-cardiac care.
+Deterministic population model estimating excess congenital heart disease
+mortality and disability adjusted life years associated with disruption
+of pediatric cardiac care.
 
-Outputs:
-- baseline model results
-- sensitivity analysis
-- Monte Carlo uncertainty analysis
-- results written to /results directory
+Structure
+
+1. Parameter definitions
+2. Baseline deterministic model
+3. Terminal output
+4. Results file export
+5. Probabilistic uncertainty simulation
 """
 
 import os
 import random
+
 
 # --------------------------------------------------
 # PARAMETERS
@@ -35,14 +38,16 @@ mean_age_death = 1.5
 
 disability_weight = 0.081
 
+
 # --------------------------------------------------
 # RESULTS DIRECTORY
 # --------------------------------------------------
 
 os.makedirs("results", exist_ok=True)
 
+
 # --------------------------------------------------
-# BASELINE MODEL
+# BASELINE MODEL CALCULATIONS
 # --------------------------------------------------
 
 births_per_year = population * birth_rate
@@ -63,8 +68,9 @@ yld = survivors * disability_weight * study_years
 
 dalys = yll + yld
 
+
 # --------------------------------------------------
-# PRINT RESULTS
+# TERMINAL OUTPUT
 # --------------------------------------------------
 
 print("\nMODEL RESULTS\n")
@@ -77,11 +83,12 @@ print(f"Equation 5 (Years of Life Lost): {round(yll)}")
 print(f"Equation 6 (Years Lived with Disability): {round(yld)}")
 print(f"Equation 7 (DALYs): {round(dalys)}")
 
+
 # --------------------------------------------------
-# WRITE BASELINE RESULTS
+# WRITE BASELINE RESULTS FILE
 # --------------------------------------------------
 
-with open("results/baseline_results.txt","w") as f:
+with open("results/baseline_results.txt", "w") as f:
 
     f.write("Baseline Model Results\n\n")
 
@@ -89,15 +96,16 @@ with open("results/baseline_results.txt","w") as f:
     f.write(f"Total births: {round(total_births)}\n")
     f.write(f"CHD cases: {round(chd_cases)}\n")
     f.write(f"Excess deaths: {round(excess_deaths)}\n")
-    f.write(f"YLL: {round(yll)}\n")
-    f.write(f"YLD: {round(yld)}\n")
-    f.write(f"DALYs: {round(dalys)}\n")
+    f.write(f"Years of Life Lost (YLL): {round(yll)}\n")
+    f.write(f"Years Lived with Disability (YLD): {round(yld)}\n")
+    f.write(f"Total DALYs: {round(dalys)}\n")
+
 
 # --------------------------------------------------
-# MONTE CARLO UNCERTAINTY ANALYSIS
+# PROBABILISTIC UNCERTAINTY SIMULATION
 # --------------------------------------------------
 
-print("\nMONTE CARLO UNCERTAINTY ANALYSIS\n")
+print("\nUNCERTAINTY SIMULATION\n")
 
 runs = 10000
 
@@ -105,7 +113,11 @@ dalys_results = []
 
 for i in range(runs):
 
-    mortality = random.uniform(0.20,0.35)
+    # sample untreated mortality from normal distribution
+    mortality = random.normalvariate(0.27, 0.04)
+
+    # constrain to valid probability range
+    mortality = max(0, min(1, mortality))
 
     excess = chd_cases * (mortality - treated_mortality)
 
@@ -119,27 +131,31 @@ for i in range(runs):
 
     dalys_results.append(daly_u)
 
+
 dalys_results.sort()
 
 lower = dalys_results[int(0.025 * runs)]
-upper = dalys_results[int(0.975 * runs)]
 median = dalys_results[int(0.50 * runs)]
+upper = dalys_results[int(0.975 * runs)]
+
 
 print(f"Median DALYs: {round(median)}")
 print(f"95% uncertainty interval: {round(lower)} - {round(upper)}")
 
+
 # --------------------------------------------------
-# WRITE MONTE CARLO RESULTS
+# WRITE UNCERTAINTY RESULTS
 # --------------------------------------------------
 
-with open("results/monte_carlo_summary.txt","w") as f:
+with open("results/uncertainty_summary.txt", "w") as f:
 
-    f.write("Monte Carlo Uncertainty Analysis\n\n")
+    f.write("Uncertainty Simulation Results\n\n")
 
-    f.write(f"Runs: {runs}\n\n")
+    f.write(f"Simulation runs: {runs}\n\n")
 
     f.write(f"Median DALYs: {round(median)}\n")
-    f.write(f"Lower 95% interval: {round(lower)}\n")
-    f.write(f"Upper 95% interval: {round(upper)}\n")
+    f.write(f"Lower 95 percent interval: {round(lower)}\n")
+    f.write(f"Upper 95 percent interval: {round(upper)}\n")
+
 
 print("\nResults written to /results directory\n")
